@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/SpazzingLicorice/spazzinglicorice.git"
+    "url": "https://github.com/festivetoaster/spazzinglicorice.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SpazzingLicorice/spazzinglicorice/issues"
+    "url": "https://github.com/festivetoaster/spazzinglicorice/issues"
   },
-  "homepage": "https://github.com/SpazzingLicorice/spazzinglicorice",
+  "homepage": "https://github.com/festivetoaster/spazzinglicorice",
   "dependencies": {
     "angular": "^1.4.7",
     "body-parser": "^1.14.1",
