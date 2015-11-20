@@ -31,10 +31,11 @@ app.get('/documentation', function(req, res) {
 });
 
 app.get('/signin', function(req, res) {
+  console.log('loading signin page');
   res.sendFile(__dirname + '/public/signin.html');
 
   // Redirect to the user's boards after login.
-  res.redirect('/boards');
+  // res.redirect('/boards');
 });
 
 app.get('/boards', function(req, res) {
