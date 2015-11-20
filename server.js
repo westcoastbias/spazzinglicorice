@@ -8,6 +8,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var Board = require('./db/board');
+var User = require('./db/user');
 var port = process.env.PORT || 8080;
 var handleSocket = require('./server/sockets');
 
