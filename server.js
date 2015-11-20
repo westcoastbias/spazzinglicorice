@@ -16,6 +16,8 @@ var handleSocket = require('./server/sockets');
 
 // **Static folder for serving application assets**
 app.use('/', express.static(__dirname + '/public'));
+app.use('/signin', express.static(__dirname + '/public'));
+
 
 // **Static folder for serving documentation**
 app.use('/documentation', express.static(__dirname + '/docs'));
@@ -30,6 +32,11 @@ app.get('/documentation', function(req, res) {
   res.sendFile(__dirname + '/docs/tableofcontents.html');
 });
 
+// ** Signin Page **
+app.get('/signin', function(req, res) {
+  console.log('loading signin page');
+  res.sendFile(__dirname + '/public/signin.html');
+});
 
 app.post('/signin', function(req, res) {
   console.log('authenticating user');
@@ -39,6 +46,7 @@ app.post('/signin', function(req, res) {
 
 app.get('/boards', function(req, res) {
   // Needs to be filled in
+  console.log('redirecting to boards page');
 
 });
 
@@ -77,10 +85,6 @@ app.get('/*', function(req, res) {
   });
 });
 
-app.get('/signin', function(req, res) {
-  console.log('loading signin page');
-  res.sendFile(__dirname + '/public/signin.html');
-});
 
 // **Start the server.**
 http.listen(port, function() {
