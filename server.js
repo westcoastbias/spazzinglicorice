@@ -16,7 +16,7 @@ var handleSocket = require('./server/sockets');
 
 // **Static folder for serving application assets**
 app.use('/', express.static(__dirname + '/public'));
-app.use('/signin', express.static(__dirname + '/public'));
+app.use('/signin', express.static(__dirname + '/public/signin.html'));
 
 
 // **Static folder for serving documentation**
