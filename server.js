@@ -33,9 +33,6 @@ app.get('/documentation', function(req, res) {
 app.get('/signin', function(req, res) {
   console.log('loading signin page');
   res.sendFile(__dirname + '/public/signin.html');
-
-  // Redirect to the user's boards after login.
-  // res.redirect('/boards');
 });
 
 app.get('/boards', function(req, res) {
@@ -65,6 +62,7 @@ app.get('/*', function(req, res) {
   Board.boardModel.findOne({id: id}, function(err, board) {
     // If the board doesn't exist, or the route is invalid,
     // then redirect to the home page.
+    console.log('going to board');
     if (err) {
       res.redirect('/');
     } else {
