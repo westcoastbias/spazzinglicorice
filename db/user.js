@@ -30,7 +30,7 @@ userSchema.methods.comparePassword = function (attemptedPassword, callback) {
   });
 };
 
-var User = mongoose.Model('user', userSchema);
+var User = mongoose.model('user', userSchema);
 
 module.exports = User;
 

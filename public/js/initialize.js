@@ -20,180 +20,168 @@ $(function() {
 
 
 
+  if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+
+    // **Touch Events**
+
+    var brd = document.getElementById('whiteboard');
+
+    var hammer = new Hammer(brd);
+
+    hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
 
 
-  // **Touch Events**
+    hammer.on('panstart', function(e) {
 
-  var brd = document.getElementById('whiteboard');
+      // Allow user drawing only if other users are not drawing.
+      if (!App.isAnotherUserActive) {
+        console.log("User has started to draw.");
 
-  var hammer = new Hammer(brd);
+        // Initialize mouse position.
+        App.mouse.click = true;
+        App.mouse.x = e.center.x;
+        App.mouse.y = e.center.y - 50;
 
-  hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+        // ```App.initializeMouseDown``` is from [app.js](../docs/app.html) where it initializes the pen and canvas before rendeirng.
+        App.initializeMouseDown(App.pen, App.mouse.x, App.mouse.y);
 
+        // Emit the pen object through socket.
+        App.socket.emit('start', App.pen);
 
-  hammer.on('panstart', function(e) {
-
-    // Allow user drawing only if other users are not drawing.
-    if (!App.isAnotherUserActive) {
-      console.log("User has started to draw.");
-
-      // Initialize mouse position.
-      App.mouse.click = true;
-      App.mouse.x = e.center.x;
-      App.mouse.y = e.center.y - 50;
-
-      // ```App.initializeMouseDown``` is from [app.js](../docs/app.html) where it initializes the pen and canvas before rendeirng.
-      App.initializeMouseDown(App.pen, App.mouse.x, App.mouse.y);
-
-      // Emit the pen object through socket. 
-      App.socket.emit('start', App.pen);
-
-      // Add the first mouse coordinates to the ```stroke``` array for storage.
-      App.stroke.push([App.mouse.x, App.mouse.Y]);
-    } else {
-      console.log('Another user is drawing - please wait.');
-    }
-  });
-
-
-  // On mousedrag detection, start to render drawing elements based on user's cursor coordinates.
-  hammer.on('panleft panright panup pandown', function(e) {
-    // Allow user drawing only if other users are not drawing.
-    if (!App.isAnotherUserActive) {
-      if (App.mouse.click) {
-        App.mouse.drag = true;
-
-        // Find x,y coordinates of the mouse dragging on the anvas.
-        var x = e.center.x;
-        var y = e.center.y - 50;
-
-        // Render the drawing.
-        App.draw(x, y);
-        console.log("Currently drawing coordinates", [x, y]);
-
-        // Continue to push coordinates to stroke array (as part of storage).
-        App.stroke.push([x, y]);
-
-        // Emit x, y in a tuple through socket. 
-        App.socket.emit('drag', [x, y]);
+        // Add the first mouse coordinates to the ```stroke``` array for storage.
+        App.stroke.push([App.mouse.x, App.mouse.Y]);
+      } else {
+        console.log('Another user is drawing - please wait.');
       }
-    } else {
-      console.log('Another user is drawing - please wait.');
-    }
-  });
-
-  // On mouse dragend detection, tell socket that we have finished drawing. 
-  hammer.on('panend', function(e) {
-    if (!App.isAnotherUserActive) {
-      App.mouse.drag = false;
-      App.mouse.click = false;
-
-      console.log("Drawing is finished and its data is being pushed to the server", [App.stroke, App.pen]);
-
-      // Empty the App.stroke array.
-      App.stroke = [];
-
-      // Tell socket that we've finished sending data.
-      App.socket.emit('end', null);
-
-    } else {
-      console.log('Another user is drawing - please wait.');
-    }
-  });
-
-  // If the cursor leaves the canvas whiteboard, simply stop drawing any more elements (by triggering a 'dragend' event).
-  hammer.on('panend', function(e) {
-    App.canvas.trigger('dragend');
-  });
+    });
 
 
+    // On mousedrag detection, start to render drawing elements based on user's cursor coordinates.
+    hammer.on('panleft panright panup pandown', function(e) {
+      // Allow user drawing only if other users are not drawing.
+      if (!App.isAnotherUserActive) {
+        if (App.mouse.click) {
+          App.mouse.drag = true;
+
+          // Find x,y coordinates of the mouse dragging on the anvas.
+          var x = e.center.x;
+          var y = e.center.y - 50;
+
+          // Render the drawing.
+          App.draw(x, y);
+          console.log("Currently drawing coordinates", [x, y]);
+
+          // Continue to push coordinates to stroke array (as part of storage).
+          App.stroke.push([x, y]);
+
+          // Emit x, y in a tuple through socket.
+          App.socket.emit('drag', [x, y]);
+        }
+      } else {
+        console.log('Another user is drawing - please wait.');
+      }
+    });
+
+    // On mouse dragend detection, tell socket that we have finished drawing.
+    hammer.on('panend', function(e) {
+      if (!App.isAnotherUserActive) {
+        App.mouse.drag = false;
+        App.mouse.click = false;
+
+        console.log("Drawing is finished and its data is being pushed to the server", [App.stroke, App.pen]);
+
+        // Empty the App.stroke array.
+        App.stroke = [];
+
+        // Tell socket that we've finished sending data.
+        App.socket.emit('end', null);
+
+      } else {
+        console.log('Another user is drawing - please wait.');
+      }
+    });
+
+    // If the cursor leaves the canvas whiteboard, simply stop drawing any more elements (by triggering a 'dragend' event).
+    hammer.on('panend', function(e) {
+      App.canvas.trigger('dragend');
+    });
+  } else {
+    // **Mouse Events**
+
+    // On mousedown detection, initialize drawing properties based on mouse coordinates.
+    App.canvas.on('mousedown', function(e) {
+
+      // Allow user drawing only if other users are not drawing.
+      if (!App.isAnotherUserActive) {
+        console.log("User has started to draw.");
+
+        // Initialize mouse position.
+        App.mouse.click = true;
+        App.mouse.x = e.offsetX;
+        App.mouse.y = e.offsetY;
+
+        // ```App.initializeMouseDown``` is from [app.js](../docs/app.html) where it initializes the pen and canvas before rendeirng.
+        App.initializeMouseDown(App.pen, App.mouse.x, App.mouse.y);
+
+        // Emit the pen object through socket.
+        App.socket.emit('start', App.pen);
+
+        // Add the first mouse coordinates to the ```stroke``` array for storage.
+        App.stroke.push([App.mouse.x, App.mouse.Y]);
+      } else {
+        console.log('Another user is drawing - please wait.');
+      }
+    });
 
 
+    // On mousedrag detection, start to render drawing elements based on user's cursor coordinates.
+    App.canvas.on('drag', function(e) {
+      // Allow user drawing only if other users are not drawing.
+      if (!App.isAnotherUserActive) {
+        if (App.mouse.click) {
+          App.mouse.drag = true;
 
+          // Find x,y coordinates of the mouse dragging on the canvas.
+          var x = e.offsetX;
+          var y = e.offsetY;
 
+          // Render the drawing.
+          App.draw(x, y);
+          console.log("Currently drawing coordinates", [x, y]);
 
+          // Continue to push coordinates to stroke array (as part of storage).
+          App.stroke.push([x, y]);
 
+          // Emit x, y in a tuple through socket.
+          App.socket.emit('drag', [x, y]);
+        }
+      } else {
+        console.log('Another user is drawing - please wait.');
+      }
+    });
 
+    // On mouse dragend detection, tell socket that we have finished drawing.
+    App.canvas.on('dragend', function(e) {
+      if (!App.isAnotherUserActive) {
+        App.mouse.drag = false;
+        App.mouse.click = false;
 
+        console.log("Drawing is finished and its data is being pushed to the server", [App.stroke, App.pen]);
 
+        // Empty the App.stroke array.
+        App.stroke = [];
 
-  // // **Mouse Events**
+        // Tell socket that we've finished sending data.
+        App.socket.emit('end', null);
 
-  // // On mousedown detection, initialize drawing properties based on mouse coordinates. 
-  // App.canvas.on('mousedown', function(e) {
+      } else {
+        console.log('Another user is drawing - please wait.');
+      }
+    });
 
-  //   // Allow user drawing only if other users are not drawing.
-  //   if (!App.isAnotherUserActive) {
-  //     console.log("User has started to draw.");
-
-  //     // Initialize mouse position.
-  //     App.mouse.click = true;
-  //     App.mouse.x = e.offsetX;
-  //     App.mouse.y = e.offsetY;
-
-  //     // ```App.initializeMouseDown``` is from [app.js](../docs/app.html) where it initializes the pen and canvas before rendeirng.
-  //     App.initializeMouseDown(App.pen, App.mouse.x, App.mouse.y);
-
-  //     // Emit the pen object through socket. 
-  //     App.socket.emit('start', App.pen);
-
-  //     // Add the first mouse coordinates to the ```stroke``` array for storage.
-  //     App.stroke.push([App.mouse.x, App.mouse.Y]);
-  //   } else {
-  //     console.log('Another user is drawing - please wait.');
-  //   }
-  // });
-
-
-  // // On mousedrag detection, start to render drawing elements based on user's cursor coordinates.
-  // App.canvas.on('drag', function(e) {
-  //   // Allow user drawing only if other users are not drawing.
-  //   if (!App.isAnotherUserActive) {
-  //     if (App.mouse.click) {
-  //       App.mouse.drag = true;
-
-  //       // Find x,y coordinates of the mouse dragging on the canvas.
-  //       var x = e.offsetX;
-  //       var y = e.offsetY;
-
-  //       // Render the drawing.
-  //       App.draw(x, y);
-  //       console.log("Currently drawing coordinates", [x, y]);
-
-  //       // Continue to push coordinates to stroke array (as part of storage).
-  //       App.stroke.push([x, y]);
-
-  //       // Emit x, y in a tuple through socket. 
-  //       App.socket.emit('drag', [x, y]);
-  //     }
-  //   } else {
-  //     console.log('Another user is drawing - please wait.');
-  //   }
-  // });
-
-  // // On mouse dragend detection, tell socket that we have finished drawing. 
-  // App.canvas.on('dragend', function(e) {
-  //   if (!App.isAnotherUserActive) {
-  //     App.mouse.drag = false;
-  //     App.mouse.click = false;
-
-  //     console.log("Drawing is finished and its data is being pushed to the server", [App.stroke, App.pen]);
-
-  //     // Empty the App.stroke array.
-  //     App.stroke = [];
-
-  //     // Tell socket that we've finished sending data.
-  //     App.socket.emit('end', null);
-
-  //   } else {
-  //     console.log('Another user is drawing - please wait.');
-  //   }
-  // });
-
-  // // If the cursor leaves the canvas whiteboard, simply stop drawing any more elements (by triggering a 'dragend' event).
-  // App.canvas.on('mouseleave', function(e) {
-  //   App.canvas.trigger('dragend');
-  // });
-
-
+    // If the cursor leaves the canvas whiteboard, simply stop drawing any more elements (by triggering a 'dragend' event).
+    App.canvas.on('mouseleave', function(e) {
+      App.canvas.trigger('dragend');
+    });
+  }
 });
