@@ -19,7 +19,7 @@ var handleSocket = require('./server/sockets');
 
 
 // **Static folder for serving documentation**
-app.use('/documentation', express.static(__dirname + '/docs'));
+// app.use('/documentation', express.static(__dirname + '/docs'));
 
 // **Home Page**
 app.get('/', function(req, res) {
