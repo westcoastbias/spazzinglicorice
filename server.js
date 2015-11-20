@@ -30,6 +30,16 @@ app.get('/documentation', function(req, res) {
   res.sendFile(__dirname + '/docs/tableofcontents.html');
 });
 
+// app.get('/signin', function(req, res) {
+
+//   // Redirect to the user's boards after login.
+//   res.redirect('/boards');
+// });
+
+// app.get('/boards', function(req, res) {
+//   // Needs to be filled in
+
+// });
 
 // **Get a new whiteboard**
 app.get('/new', function(req, res) {
