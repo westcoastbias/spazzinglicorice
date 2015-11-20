@@ -13,4 +13,4 @@ var boardSchema = new mongoose.Schema({
 var Board = mongoose.model('board', boardSchema);
 
 // Required by [Server](../documentation/server.html) & [Socket Connection Handler](../documentation/sockets.html)
-module.exports = Board;
+module.exports.boardModel = Board;
