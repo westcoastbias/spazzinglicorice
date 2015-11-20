@@ -4,9 +4,6 @@
   "description": "Multiplayer Whiteboard",
   "main": "server.js",
   "scripts": {
-    "test": "mocha ./test/dbTest.js && node ./test/socketTest.js"
-  },
-  "scripts": {
     "test": "npm run test-db && npm run test-socket",
     "test-db": "mocha ./test/dbTest.js",
     "test-socket": "mocha ./test/socketTest.js"
@@ -23,6 +20,8 @@
   "homepage": "https://github.com/festivetoaster/spazzinglicorice",
   "dependencies": {
     "angular": "^1.4.7",
+    "bcrypt-nodejs": "0.0.3",
+    "bluebird": "^3.0.5",
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
     "grunt-docco": "^0.4.0",
