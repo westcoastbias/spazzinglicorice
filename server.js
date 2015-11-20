@@ -30,9 +30,11 @@ app.get('/documentation', function(req, res) {
   res.sendFile(__dirname + '/docs/tableofcontents.html');
 });
 
-app.get('/signin', function(req, res) {
-  console.log('loading signin page');
-  res.sendFile(__dirname + '/public/signin.html');
+
+app.post('/signin', function(req, res) {
+  console.log('authenticating user');
+  //authenticate user
+  res.redirect('/boards');
 });
 
 app.get('/boards', function(req, res) {
@@ -73,6 +75,11 @@ app.get('/*', function(req, res) {
       res.sendFile(__dirname + '/public/board.html');
     }
   });
+});
+
+app.get('/signin', function(req, res) {
+  console.log('loading signin page');
+  res.sendFile(__dirname + '/public/signin.html');
 });
 
 // **Start the server.**
