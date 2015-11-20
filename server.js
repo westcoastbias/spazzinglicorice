@@ -31,7 +31,7 @@ app.get('/documentation', function(req, res) {
 });
 
 app.get('/signin', function(req, res) {
-  res.sendFile(__dirname + '/lib/signin.html');
+  res.sendFile(__dirname + '/public/signin.html');
 
   // Redirect to the user's boards after login.
   res.redirect('/boards');
