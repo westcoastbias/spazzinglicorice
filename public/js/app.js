@@ -82,9 +82,58 @@ App.init = function() {
       App.context[key] = pen[key];
     }
 
-    // Begin draw.
-    App.context.beginPath();
-    App.context.moveTo(moveToX, moveToY);
+    var ctx = App.context;
+
+    if (pen.strokeStyle === 'olive') {
+      pen.strokeStyle = '';
+
+      // CanvasInput -- http://goldfirestudios.com/blog/108/CanvasInput-HTML5-Canvas-Text-Input
+
+      var input = new CanvasInput({
+        canvas: document.getElementById('whiteboard'),
+        x: moveToX,
+        y: moveToY,
+        borderWidth: 0,
+        innerShadow: 'none',
+        boxShadow: 'none',
+        backgroundColor: 'white',
+        borderColor: 'white',
+        placeHolder: 'new text box',
+        fontSize: 19,
+        width: 400,
+        height: 17,
+        onsubmit: function() {
+          // ctx.drawImage(input.renderCanvas(), moveToX, moveToY);  draw back to canvas like this
+          console.log(input.renderCanvas().toDataURL("imgae/png"));
+          input.destroy();
+
+        }
+          
+      })
+
+      
+      // input.destroy/();
+
+      // setTimeout(function() {
+      //   input.destroy();
+      // }, 1000);
+      //create form field in positon
+      //on submit fill text at that locaiton with text
+      // var $span = $('<div class=thingy>MOVED IN</div>');
+      // App.canvas.append($span);
+      // $span.css({"left":200, "top": 200, "background-color": "blue", "position": "absolute", "z-index": "1000"});
+      // var text = prompt('Enter Text')
+      // ctx.font = "30px Arial"
+      // if (text) {
+      //   App.context.fillText(text, moveToX, moveToY)
+      // }
+      //handle placing text
+        // }
+    } else {
+      // Begin draw.
+      App.context.beginPath();
+      App.context.moveTo(moveToX, moveToY);
+    }
   };
 
 
@@ -127,6 +176,7 @@ App.init = function() {
     if (App.prevPixel.length === 0) {
       App.prevPixel = data.coords;
     }
+
 
     // Initialize beginning coordinates and drawing.
     App.initializeMouseDown(data.pen, App.prevPixel[0], App.prevPixel[1]);
