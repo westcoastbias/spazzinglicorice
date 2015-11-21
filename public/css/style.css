@@ -104,6 +104,23 @@ video {
   opacity: 0.75;
 }
 
+#signin {
+/*  -webkit-animation: header 1.1s 1.1s forwards;
+  animation: header 1.1s 1.1s forwards;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  opacity: 0;*/
+  text-align: center;
+}
+
+#signinHeader {
+/*  -webkit-animation: header 1.1s 1.1s forwards;
+  animation: header 1.1s 1.1s forwards;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  opacity: 0;*/
+  text-align: center;
+}
 
 /*button {
   width: 341px;

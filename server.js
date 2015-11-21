@@ -11,15 +11,24 @@ var Board = require('./db/board');
 var User = require('./db/user');
 var port = process.env.PORT || 8080;
 var handleSocket = require('./server/sockets');
+var session = require('express-session');
+var util = require('./server/utility.js');
+
+
+app.use(session({
+  secret: 'saxaphone wombat',
+  resave: false,
+  saveUninitialized: true
+}));
 
 // ## Routes
 
 // **Static folder for serving application assets**
-// app.use('/', express.static(__dirname + '/public'));
+app.use('/', express.static(__dirname + '/public'));
 
 
 // **Static folder for serving documentation**
-// app.use('/documentation', express.static(__dirname + '/docs'));
+app.use('/documentation', express.static(__dirname + '/docs'));
 
 // **Home Page**
 // app.get('/', function(req, res) {
@@ -33,14 +42,49 @@ app.get('/documentation', function(req, res) {
 
 // ** Signin Page **
 app.get('/signin', function(req, res) {
-  console.log('loading signin page');
   res.sendFile(__dirname + '/public/signin.html');
 });
 
 app.post('/signin', function(req, res) {
-  console.log('authenticating user');
-  //authenticate user
-  res.redirect('/boards');
+  // var email = req.body.email;
+  // var password = req.body.password;
+  var email = 'lruprecht2@yahoo.com';
+  var password = 'test';
+  // var user = new User({
+  //   email: email,
+  // });
+
+  User.findOne({email: email})
+  .then( function (user) {
+    //email isn't in the db, so we create a new one
+    if ( !user ) {
+      var newUser = new User({
+        email: email,
+        password: password,
+        boards: []
+      });
+      console.log('newUser is ' + newUser);
+      newUser.save()
+        .then(function(newUser) {
+          console.log('newUser is saved as ' + newUser);
+          util.createSession(req, res, newUser);
+          res.redirect('/boards');
+        });
+  //username is in the db, so we check the password and see if we can log the user in      
+    } else {
+      console.log('found user');
+      console.log('user is ' + user );
+      user.comparePassword(password, function (match) {
+        console.log('match is ' + match);
+        if (match) {
+          util.createSession(req, res, user);
+          // res.redirect('/boards');
+        } else {
+          console.error('That password is incorrect. Please try again, or login with a different email address.');
+        }
+      });
+    }
+  });
 });
 
 app.get('/boards', function(req, res) {

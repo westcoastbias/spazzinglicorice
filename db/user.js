@@ -12,20 +12,28 @@ var userSchema = new mongoose.Schema ({
 });
 
 userSchema.pre('save', function ( next ) {
-  this.hashPassword();
-  next();
-});
+  console.log('in the presave hook');
+  this.hashPassword().then(function(){
+    next();
+  });
+}, this);
+
 
 userSchema.methods.hashPassword = function () {
+  console.log('in the hashPassword function');
   var cipher = Promise.promisify(bcrypt.hash);
   return cipher(this.password, null, null).bind(this)
     .then(function(hash) {
+      console.log('hash is ' + hash);
       this.password = hash;
+      console.log('this is ' + this);
     });
 };
 
 userSchema.methods.comparePassword = function (attemptedPassword, callback) {
   bcrypt.compare(attemptedPassword, this.password, function(err, isMatch) {
+    console.log('attemptedPassword is ' + attemptedPassword);
+    console.log('this.password is ' + this.password);
     callback(isMatch);
   });
 };
