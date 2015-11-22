@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-controller='signinController'>
+<html ng-app='signin'>
   <head>
     <meta charset="UTF-8">
     <title>Colla-board-rate</title>
@@ -12,9 +12,9 @@
       <!-- <source src="assets/dayinthelifeshort-720p.mov" type="video/mp4"> -->
     </video>
       <h3 id="signinHeader" >Sign in or Sign up</h3>
-      <form name="signinForm" ng-submit='signin()'>
+      <form ng-controller="SigninController" name="signinForm" ng-submit='signin()'>
         <div>Email</div>
-        <input label='Email' type='text'ng-model='user.username'>
+        <input label='Email' type='text'ng-model='user.email'>
         <div>Password</div>
         <input label='Password' type="password" ng-model='user.password'>
         <button>Let's Go!</button>

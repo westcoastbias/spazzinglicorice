@@ -24,16 +24,12 @@ userSchema.methods.hashPassword = function () {
   var cipher = Promise.promisify(bcrypt.hash);
   return cipher(this.password, null, null).bind(this)
     .then(function(hash) {
-      console.log('hash is ' + hash);
       this.password = hash;
-      console.log('this is ' + this);
     });
 };
 
 userSchema.methods.comparePassword = function (attemptedPassword, callback) {
   bcrypt.compare(attemptedPassword, this.password, function(err, isMatch) {
-    console.log('attemptedPassword is ' + attemptedPassword);
-    console.log('this.password is ' + this.password);
     callback(isMatch);
   });
 };

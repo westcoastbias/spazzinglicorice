@@ -13,8 +13,13 @@ var port = process.env.PORT || 8080;
 var handleSocket = require('./server/sockets');
 var session = require('express-session');
 var util = require('./server/utility.js');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var sessionStore = new session.MemoryStore();
 
-
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.use(session({
   secret: 'saxaphone wombat',
   resave: false,
@@ -46,13 +51,9 @@ app.get('/signin', function(req, res) {
 });
 
 app.post('/signin', function(req, res) {
-  // var email = req.body.email;
-  // var password = req.body.password;
-  var email = 'lruprecht2@yahoo.com';
-  var password = 'test';
-  // var user = new User({
-  //   email: email,
-  // });
+  console.log('hitting back end');
+  var email = req.body.email;
+  var password = req.body.password;
 
   User.findOne({email: email})
   .then( function (user) {
@@ -68,7 +69,6 @@ app.post('/signin', function(req, res) {
         .then(function(newUser) {
           console.log('newUser is saved as ' + newUser);
           util.createSession(req, res, newUser);
-          res.redirect('/boards');
         });
   //username is in the db, so we check the password and see if we can log the user in      
     } else {
@@ -78,7 +78,6 @@ app.post('/signin', function(req, res) {
         console.log('match is ' + match);
         if (match) {
           util.createSession(req, res, user);
-          // res.redirect('/boards');
         } else {
           console.error('That password is incorrect. Please try again, or login with a different email address.');
         }
@@ -87,10 +86,18 @@ app.post('/signin', function(req, res) {
   });
 });
 
-app.get('/boards', function(req, res) {
-  // Needs to be filled in
-  console.log('redirecting to boards page');
+app.get('/session', function(req, res){
+  sessionStore.get(req.sessionID, function(err, data) {
+    res.send({err: err, data:data});
+  });
+});
 
+app.get('/boards', function(req, res) {
+  console.log('loading boards.html');
+  util.checkUser(req, res, function() {
+    console.log('res is ' + JSON.stringify(res.end));
+    res.sendFile(__dirname + '/public/boards.html');
+  });
 });
 
 // **Get a new whiteboard**
