@@ -85,7 +85,7 @@ App.init = function() {
     var ctx = App.context;
 
     if (pen.strokeStyle === 'olive') {
-      pen.strokeStyle = '';
+      pen.strokeStyle = 'textBox';
 
       // CanvasInput -- http://goldfirestudios.com/blog/108/CanvasInput-HTML5-Canvas-Text-Input
 
@@ -104,7 +104,8 @@ App.init = function() {
         height: 17,
         onsubmit: function() {
           // ctx.drawImage(input.renderCanvas(), moveToX, moveToY);  draw back to canvas like this
-          console.log(input.renderCanvas().toDataURL("imgae/png"));
+          var image = input.renderCanvas().toDataURL("imgae/png");
+          App.socket.emit('end', {image:image, coords:[moveToX, moveToY]});
           input.destroy();
 
         }
@@ -149,16 +150,24 @@ App.init = function() {
       for (var i = 0; i < board.strokes.length; i++) {
         // Check for null stroke data.
         if (board.strokes[i]) {
-          // Set pen and draw path.
-          var strokesArray = board.strokes[i].path;
-          var penProperties = board.strokes[i].pen;
-          App.initializeMouseDown(penProperties, strokesArray[0][0], strokesArray[0][1]);
+          if (board.strokes[i].image) {
+            console.log('board.strokes[i].image =', board.strokes[i].image);
+            var img = new Image;
+            img.src = board.strokes[i].image;
+            App.context.drawImage(img, board.strokes[i].coords[0], board.strokes[i].coords[1]);
+          } else {
+            // Set pen and draw path.
+            var strokesArray = board.strokes[i].path;
+            var penProperties = board.strokes[i].pen;
+            App.initializeMouseDown(penProperties, strokesArray[0][0], strokesArray[0][1]);
 
-          // Draw the path according to the strokesArray (array of coordinate tuples).
-          for (var j = 0; j < strokesArray.length; j++) {
-            App.draw(strokesArray[j][0], strokesArray[j][1]);
+            // Draw the path according to the strokesArray (array of coordinate tuples).
+            for (var j = 0; j < strokesArray.length; j++) {
+              App.draw(strokesArray[j][0], strokesArray[j][1]);
+            }
+            App.context.closePath();
+            
           }
-          App.context.closePath();
         }
       }
     }
