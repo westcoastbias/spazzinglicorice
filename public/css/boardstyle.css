@@ -306,6 +306,10 @@ label[for=blue] {
   background: darkblue;
 }
 
+.palette #white:not(:checked) + label:after {
+  background: white;
+}
+
 
 
 

@@ -25,6 +25,17 @@ var connect = function(boardUrl, board, io) {
       };
     });
 
+    socket.on('clear', function() {
+      console.log('in clear');
+      //Get the board that the socket is connected to.
+      var id = socket.nsp.name.slice(1);
+      //remove all data associated with board from DB
+      Board.boardModel.remove({id:id}, function(err, data) {
+        // Tell all associated boards to clear themselves
+        whiteboard.emit('clearDone', null);
+      })      
+    })
+
     socket.on('drag', function(coords) {
       //Push coordinates into the stroke's drawing path.
       socket.stroke.path.push(coords);

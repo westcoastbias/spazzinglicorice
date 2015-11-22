@@ -84,7 +84,12 @@ App.init = function() {
 
     var ctx = App.context;
 
+    //check if textbox pen has been selected
     if (pen.strokeStyle === 'olive') {
+
+      //TODO: Handle App.isAnotherUserActive functionality with respect to this feature
+
+      //if it has, change strokeStyle to 'textBox' so further clicks do not create text box fields
       pen.strokeStyle = 'textBox';
 
       // CanvasInput -- http://goldfirestudios.com/blog/108/CanvasInput-HTML5-Canvas-Text-Input
@@ -114,7 +119,7 @@ App.init = function() {
         onkeyup: function() {
           //similar to above, less the destroy().  Live updates other users with text as it is being typed
           var image = input.renderCanvas().toDataURL("imgae/png");
-
+          //send url and location to other sockets
           App.socket.emit('type', {image:image, coords:[moveToX, moveToY]});
         }
       })
@@ -209,7 +214,12 @@ App.init = function() {
       App.isAnotherUserActive = false;
     }
 
+  });
 
+  // when someone clicked clear board
+  App.socket.on('clearDone', function() {
+    //clear the board
+    App.context.clearRect(0, 0, App.canvas.width(), App.canvas.height());
   });
 
 };
