@@ -90,28 +90,52 @@ var connect = function(boardUrl, board, io) {
 
     })
 
+    // undo
+    socket.on('undo', function() {
+      //Get the board that the socket is connected to.
+      var id = socket.nsp.name.slice(1);
+
+       Board.boardModel.update({id: id},{$pop: {strokes: 1} },function(err, board){
+          if(err){ console.log(err); }
+          else {
+            console.log(board);
+            Board.boardModel.findOne({id: id}, function(err, board) {
+            // send undo event to all boards
+            console.log(board);
+              whiteboard.emit('undo', board);
+              console.log("Successfully performed undo");
+            })
+
+          }
+        });
+
+
+    })
+
     //When stroke is finished, add it to our db.
     socket.on('end', function(data) {
       //Get the board that the socket is connected to.
       var id = socket.nsp.name.slice(1);
  
         var finishedStroke = socket.stroke;
-      // }
+        // check for null data (TODO: make sure this check doesn't cause any other bugs)
+        if (finishedStroke) {
+          //Update the board with the new stroke.
+          Board.boardModel.update({id: id},{$push: {strokes: finishedStroke} },{upsert:true},function(err, board){
+            if(err){ console.log(err); }
+            else {
+              console.log("Successfully added");
+            }
+          });
 
-        //Update the board with the new stroke.
-        Board.boardModel.update({id: id},{$push: {strokes: finishedStroke} },{upsert:true},function(err, board){
-          if(err){ console.log(err); }
-          else {
-            console.log("Successfully added");
-          }
-        });
 
+        // Emit end event to everyone but the person who stopped drawing.
+        socket.broadcast.emit('end', null);
 
-      // Emit end event to everyone but the person who stopped drawing.
-      socket.broadcast.emit('end', null);
-
-      //Delete the stroke object to make room for the next stroke.
-      delete socket.stroke;
+        //Delete the stroke object to make room for the next stroke.
+        delete socket.stroke;
+          
+        }
     });
   });
 };

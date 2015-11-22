@@ -25,6 +25,9 @@ angular.module('whiteboard', ['ui.router'])
   };
   $scope.clearBoard = function() {
     tools.clearBoard();
+  };
+  $scope.undo = function() {
+    App.socket.emit('undo');
   }
 })
 
