@@ -39,17 +39,54 @@ var connect = function(boardUrl, board, io) {
       socket.broadcast.emit('drag', payload);
     });
 
+    socket.on('type', function(textBoxInfo) {
+      //Get the board that the socket is connected to.
+      var id = socket.nsp.name.slice(1);
+
+
+      //Update the board with the new textbox info.
+
+      Board.boardModel.update({id: id},{$push: {strokes: textBoxInfo} },{upsert:true},function(err, board){
+        if(err){ console.log(err); }
+        else {
+          console.log("Successfully added");
+        }
+      });
+
+      // Emit end event to everyone but the person who stopped typing.
+      
+      socket.broadcast.emit('endText', textBoxInfo);
+      delete socket.stroke;
+    })
+
+    socket.on('endText', function(textBoxInfo) {
+      //Get the board that the socket is connected to.
+      var id = socket.nsp.name.slice(1);
+
+      //Update the board with the new textbox info.
+
+      Board.boardModel.update({id: id},{$push: {strokes: textBoxInfo} },{upsert:true},function(err, board){
+        if(err){ console.log(err); }
+        else {
+          console.log("Successfully added");
+        }
+      });
+
+      // Emit end event to everyone but the person who stopped typing.
+      
+      socket.broadcast.emit('endText', textBoxInfo);
+      delete socket.stroke;
+
+    })
+
     //When stroke is finished, add it to our db.
     socket.on('end', function(data) {
       //Get the board that the socket is connected to.
       var id = socket.nsp.name.slice(1);
-
-      console.log('we are in the end now');
-      if (socket.stroke && socket.stroke.pen.strokeStyle === 'textBox') {
-        var finishedStroke = data;
-      } else {
+ 
         var finishedStroke = socket.stroke;
-      }
+      // }
+
         //Update the board with the new stroke.
         Board.boardModel.update({id: id},{$push: {strokes: finishedStroke} },{upsert:true},function(err, board){
           if(err){ console.log(err); }

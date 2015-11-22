@@ -35,8 +35,8 @@ angular.module('whiteboard', ['ui.router'])
       console.log("The user is using the eraser.");
       $rootScope.app.pen.lineWidth = 50;
       $rootScope.app.pen.strokeStyle = '#fff';
+      // olive color communicates that the text box 'pen' has been selected, refactor later to be more clear
     } else if (option === 'olive') {
-      console.log('olive clicked')
       console.log("The user is using text.");
       $rootScope.app.pen.lineWidth = 5;
       $rootScope.app.pen.strokeStyle = 'olive';

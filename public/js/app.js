@@ -89,6 +89,7 @@ App.init = function() {
 
       // CanvasInput -- http://goldfirestudios.com/blog/108/CanvasInput-HTML5-Canvas-Text-Input
 
+      //make CanvasInput Field
       var input = new CanvasInput({
         canvas: document.getElementById('whiteboard'),
         x: moveToX,
@@ -96,40 +97,27 @@ App.init = function() {
         borderWidth: 0,
         innerShadow: 'none',
         boxShadow: 'none',
-        backgroundColor: 'white',
+        backgroundColor: 'white', 
         borderColor: 'white',
         placeHolder: 'new text box',
         fontSize: 19,
         width: 400,
         height: 17,
         onsubmit: function() {
-          // ctx.drawImage(input.renderCanvas(), moveToX, moveToY);  draw back to canvas like this
+          //on submit turn textbox into a png url
           var image = input.renderCanvas().toDataURL("imgae/png");
-          App.socket.emit('end', {image:image, coords:[moveToX, moveToY]});
+          //send url and location to other sockets
+          App.socket.emit('endText', {image:image, coords:[moveToX, moveToY]});
+          //remove text entry field
           input.destroy();
+        },
+        onkeyup: function() {
+          //similar to above, less the destroy().  Live updates other users with text as it is being typed
+          var image = input.renderCanvas().toDataURL("imgae/png");
 
+          App.socket.emit('type', {image:image, coords:[moveToX, moveToY]});
         }
-          
       })
-
-      
-      // input.destroy/();
-
-      // setTimeout(function() {
-      //   input.destroy();
-      // }, 1000);
-      //create form field in positon
-      //on submit fill text at that locaiton with text
-      // var $span = $('<div class=thingy>MOVED IN</div>');
-      // App.canvas.append($span);
-      // $span.css({"left":200, "top": 200, "background-color": "blue", "position": "absolute", "z-index": "1000"});
-      // var text = prompt('Enter Text')
-      // ctx.font = "30px Arial"
-      // if (text) {
-      //   App.context.fillText(text, moveToX, moveToY)
-      // }
-      //handle placing text
-        // }
     } else {
       // Begin draw.
       App.context.beginPath();
@@ -150,23 +138,27 @@ App.init = function() {
       for (var i = 0; i < board.strokes.length; i++) {
         // Check for null stroke data.
         if (board.strokes[i]) {
+          //check if a textBox is the current element
           if (board.strokes[i].image) {
-            console.log('board.strokes[i].image =', board.strokes[i].image);
+            //make an image tag and set it's src to the text image
             var img = new Image;
             img.src = board.strokes[i].image;
+            //draw image onto the canvas
             App.context.drawImage(img, board.strokes[i].coords[0], board.strokes[i].coords[1]);
           } else {
             // Set pen and draw path.
             var strokesArray = board.strokes[i].path;
             var penProperties = board.strokes[i].pen;
-            App.initializeMouseDown(penProperties, strokesArray[0][0], strokesArray[0][1]);
+            //check if path exists (maybe unecessary after refactoring initialize.js to not drag when using text box)
+            if (strokesArray.length >= 1) {
+              App.initializeMouseDown(penProperties, strokesArray[0][0], strokesArray[0][1]);
 
-            // Draw the path according to the strokesArray (array of coordinate tuples).
-            for (var j = 0; j < strokesArray.length; j++) {
-              App.draw(strokesArray[j][0], strokesArray[j][1]);
+              // Draw the path according to the strokesArray (array of coordinate tuples).
+              for (var j = 0; j < strokesArray.length; j++) {
+                App.draw(strokesArray[j][0], strokesArray[j][1]);
+              }
+              App.context.closePath();
             }
-            App.context.closePath();
-            
           }
         }
       }
@@ -201,6 +193,23 @@ App.init = function() {
     App.prevPixel = [];
     App.context.closePath();
     App.isAnotherUserActive = false;
+  });
+
+  //if someone is typing in a textbox or submits a text box
+  App.socket.on('endText', function(data) {
+
+    //make an image tag and set it's src to the text image
+    var img = new Image;
+
+    img.src = data.image;
+
+    //draw image onto the canvas after loading it
+    img.onload = function() {
+      App.context.drawImage(img, data.coords[0], data.coords[1]);
+      App.isAnotherUserActive = false;
+    }
+
+
   });
 
 };
