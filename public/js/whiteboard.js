@@ -29,9 +29,6 @@ angular.module('whiteboard', ['ui.router'])
   $scope.undo = function() {
     App.socket.emit('undo');
   };
-  $scope.rewind = function() {
-    App.socket.emit('rewind');
-  };
 })
 
 // Set changePen method.

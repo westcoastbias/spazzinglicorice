@@ -25,7 +25,8 @@ var connect = function(boardUrl, board, io) {
       };
     });
 
-    socket.on('rewind', function() {
+    socket.on('rewind', function(value) {
+
       //Get the board that the socket is connected to.
 
       var id = socket.nsp.name.slice(1);
@@ -34,8 +35,9 @@ var connect = function(boardUrl, board, io) {
 
       Board.boardModel.findOne({id: id}, function(err, board) {
         if (err) {console.error(err);}
+        board.value = value;
         //send rewind intent and board back to all users in room
-        whiteboard.emit('rewind', board);
+        whiteboard.emit('rewind', board, value);
       });
     })
 
@@ -111,11 +113,9 @@ var connect = function(boardUrl, board, io) {
        Board.boardModel.update({id: id},{$pop: {strokes: 1} },function(err, board){
           if(err){ console.log(err); }
           else {
-            console.log(board);
             Board.boardModel.findOne({id: id}, function(err, board) {
             // send undo event to all boards
             //TODO add error handling
-            console.log(board);
               whiteboard.emit('undo', board);
               console.log("Successfully performed undo");
             })

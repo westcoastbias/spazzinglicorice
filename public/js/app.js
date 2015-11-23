@@ -255,13 +255,43 @@ App.init = function() {
   });
 
   // when someone clicks rewind button
-  App.socket.on('rewind', function(board) {
-    console.log('heard rewind from server');
+  App.socket.on('rewind', function(board, val) {
     if (board) {
       //clear board before replaying it
       App.context.clearRect(0, 0, App.canvas.width(), App.canvas.height());
+      //detect how much of the board the user wants to replay
+      var playbackStartValue = Math.floor(board.strokes.length*(val/100));
+      //start board at correct point
+      for (var i = 0; i < playbackStartValue; i++) {
+        // Check for null stroke data.
+        if (board.strokes[i]) {
+          //check if a textBox is the current element
+          if (board.strokes[i].image) {
+            //make an image tag and set it's src to the text image
+            var img = new Image;
+            img.src = board.strokes[i].image;
+            //draw image onto the canvas
+            App.context.drawImage(img, board.strokes[i].coords[0], board.strokes[i].coords[1]);
+          } else {
+            // Set pen and draw path.
+            var strokesArray = board.strokes[i].path;
+            var penProperties = board.strokes[i].pen;
+            //check if path exists (maybe unecessary after refactoring initialize.js to not drag when using text box)
+            if (strokesArray.length >= 1) {
+              App.initializeMouseDown(penProperties, strokesArray[0][0], strokesArray[0][1]);
+
+              // Draw the path according to the strokesArray (array of coordinate tuples).
+              for (var j = 0; j < strokesArray.length; j++) {
+                App.draw(strokesArray[j][0], strokesArray[j][1]);
+              }
+              App.context.closePath();
+            }
+          }
+        }
+      }
+
       //add back one stroke at a time until all are back
-      var speedOfReplay = 1000; //time pre stroke
+      var speedOfReplay = 1000; // time per stroke
       (function fastForward (i) {          
          setTimeout(function () {   
             // Check for null stroke data.
@@ -289,12 +319,26 @@ App.init = function() {
                 }
               }
             }
-            if (++i < board.strokes.length) fastForward(i);  
+            if (++i < board.strokes.length) fastForward(i);  // recursively call fastforward until all strokes have been rendered
          }, speedOfReplay)
-      })(0);    
-      
+      })(playbackStartValue);  
+
+      //when replay is finished, set user as no longer active
+      setTimeout(function() {
+        App.isAnotherUserActive = false;
+      }, ((board.strokes.length - playbackStartValue) * speedOfReplay))  
     }
   })
+  
+  //related rewind stuff to be moved into initialize later after merge
+  $('.inline').on('change', function() {
+    //set user as active so multiple replays cannot run in concert
+    if (!App.isAnotherUserActive) {
+      App.isAnotherUserActive = true;
+      App.socket.emit('rewind', this.value);
+    }
+  });
+
 
   // when someone clicked clear board
   App.socket.on('clearDone', function() {
