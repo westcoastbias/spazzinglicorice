@@ -24,7 +24,9 @@ angular.module('whiteboard', ['ui.router'])
     $('input').not($('#' + option)).attr('checked', false);
   };
   $scope.clearBoard = function() {
-    App.socket.emit('clear');
+    if (confirm('Are you sure you want to delete all data from current board?')) {
+      App.socket.emit('clear');
+    }
   };
   $scope.undo = function() {
     App.socket.emit('undo');
