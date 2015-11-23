@@ -30,10 +30,11 @@ var connect = function(boardUrl, board, io) {
 
       var id = socket.nsp.name.slice(1);
 
-      Board.boardModel.findOne({id: id}, function(err, board) {
+      //find the current board
 
+      Board.boardModel.findOne({id: id}, function(err, board) {
         if (err) {console.error(err);}
-        
+        //send rewind intent and board back to all users in room
         whiteboard.emit('rewind', board);
       });
     })

@@ -314,6 +314,10 @@ label[for=blue] {
   background: cyan;
 }
 
+.palette #purple:not(:checked) + label:after {
+  background: purple;
+}
+
 
 
 

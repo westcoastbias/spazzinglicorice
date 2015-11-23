@@ -254,12 +254,14 @@ App.init = function() {
 
   });
 
+  // when someone clicks rewind button
   App.socket.on('rewind', function(board) {
     console.log('heard rewind from server');
     if (board) {
       //clear board before replaying it
       App.context.clearRect(0, 0, App.canvas.width(), App.canvas.height());
-
+      //add back one stroke at a time until all are back
+      var speedOfReplay = 1000; //time pre stroke
       (function fastForward (i) {          
          setTimeout(function () {   
             // Check for null stroke data.
@@ -287,8 +289,8 @@ App.init = function() {
                 }
               }
             }
-            if (++i < board.strokes.length) fastForward(i);      //  decrement i and call fastForward again if i > 0
-         }, 1000)
+            if (++i < board.strokes.length) fastForward(i);  
+         }, speedOfReplay)
       })(0);    
       
     }

@@ -24,7 +24,7 @@ angular.module('whiteboard', ['ui.router'])
     $('input').not($('#' + option)).attr('checked', false);
   };
   $scope.clearBoard = function() {
-    tools.clearBoard();
+    App.socket.emit('clear');
   };
   $scope.undo = function() {
     App.socket.emit('undo');
@@ -53,12 +53,8 @@ angular.module('whiteboard', ['ui.router'])
       $rootScope.app.pen.strokeStyle = option;
     }
   };
-  var clearBoard = function() {
-    App.socket.emit('clear');
-  };
   return {
-    changePen: changePen,
-    clearBoard: clearBoard
+    changePen: changePen
   };
 
 });
