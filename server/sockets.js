@@ -25,8 +25,20 @@ var connect = function(boardUrl, board, io) {
       };
     });
 
+    socket.on('rewind', function() {
+      //Get the board that the socket is connected to.
+
+      var id = socket.nsp.name.slice(1);
+
+      Board.boardModel.findOne({id: id}, function(err, board) {
+
+        if (err) {console.error(err);}
+        
+        whiteboard.emit('rewind', board);
+      });
+    })
+
     socket.on('clear', function() {
-      console.log('in clear');
       //Get the board that the socket is connected to.
       var id = socket.nsp.name.slice(1);
       //remove all data associated with board from DB
@@ -101,6 +113,7 @@ var connect = function(boardUrl, board, io) {
             console.log(board);
             Board.boardModel.findOne({id: id}, function(err, board) {
             // send undo event to all boards
+            //TODO add error handling
             console.log(board);
               whiteboard.emit('undo', board);
               console.log("Successfully performed undo");
