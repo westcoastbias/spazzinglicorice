@@ -324,10 +324,12 @@ App.init = function() {
       })(playbackStartValue);  
 
       //when replay is finished, set user as no longer active
-      setTimeout(function() {
-        App.isAnotherUserActive = false;
-      }, ((board.strokes.length - playbackStartValue) * speedOfReplay))  
     }
+    //handle case of no strokes on board
+    board = board || {strokes: []}
+    setTimeout(function() {
+      App.isAnotherUserActive = false;
+    }, ((board.strokes.length - playbackStartValue) * speedOfReplay))  
   })
   
   //related rewind stuff to be moved into initialize later after merge
