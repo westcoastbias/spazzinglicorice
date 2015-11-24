@@ -23,17 +23,29 @@ angular.module('whiteboard', ['ui.router'])
     console.log("The user chose the tool", $element);
     $('input').not($('#' + option)).attr('checked', false);
   };
+  $scope.clearBoard = function() {
+    if (confirm('Are you sure you want to delete all data from current board?')) {
+      App.socket.emit('clear');
+    }
+  };
+  $scope.undo = function() {
+    App.socket.emit('undo');
+  };
 })
 
 // Set changePen method.
 // Note that an eraser is simply a white pen, not actually erasing [x,y] tuples from the database. 
 .service('tools', function($rootScope) {
   var changePen = function(option) {
-    console.log($rootScope.app.pen);
     if (option === 'eraser') {
       console.log("The user is using the eraser.");
       $rootScope.app.pen.lineWidth = 50;
       $rootScope.app.pen.strokeStyle = '#fff';
+      // olive color communicates that the text box 'pen' has been selected, refactor later to be more clear when working on CSS
+    } else if (option === 'olive') {
+      console.log("The user is using text.");
+      $rootScope.app.pen.lineWidth = 5;
+      $rootScope.app.pen.strokeStyle = 'olive';
     } else {
       console.log("The user is using the pen.");
       $rootScope.app.pen.lineWidth = 5;
