@@ -51,7 +51,6 @@ app.get('/signin', function(req, res) {
 });
 
 app.post('/signin', function(req, res) {
-  console.log('hitting back end');
   var email = req.body.email;
   var password = req.body.password;
 
@@ -86,18 +85,23 @@ app.post('/signin', function(req, res) {
   });
 });
 
-app.get('/session', function(req, res){
-  sessionStore.get(req.sessionID, function(err, data) {
-    res.send({err: err, data:data});
-  });
-});
-
 app.get('/boards', function(req, res) {
   console.log('loading boards.html');
+  console.log('session boards ' + JSON.stringify(req.session.user.boards));
   util.checkUser(req, res, function() {
     console.log('res is ' + JSON.stringify(res.end));
     res.sendFile(__dirname + '/public/boards.html');
   });
+});
+
+//api endpoint hit by boards.html to pull the list of boards for the logged in user
+app.get('/getBoards', function(req, res) {
+  console.log('req.session.user.boards is ' + JSON.stringify(req.session.user.boards));
+  User.findOne({email:req.session.user.email})
+  .then(function(user) {
+    console.log('user in getBoards is ' + user);
+    res.send(user.boards);
+  })
 });
 
 // **Get a new whiteboard**
@@ -105,14 +109,25 @@ app.get('/new', function(req, res) {
   // Create a new mongoose board model.
   var board = new Board.boardModel({strokes: []});
   var id = board._id.toString();
+  var email = req.session.user.email || null;
   board.save(function(err, board) {
     if (err) { console.error(err); }
     else {
       console.log('board saved!');
+      if(email) {
+        User.findOneAndUpdate({email: email},{$push: {boards: id} },{upsert:true},function(err, user){
+          if(err){ console.log(err); }
+          else {
+            console.log("Successfully added the board to the user");
+            res.send(id);
+          }
+        });
+      } else {
+        // Redirect to the new board.
+        res.redirect('/' + id);
+      }
     }
   });
-  // Redirect to the new board.
-  res.redirect('/' + id);
 });
 
 

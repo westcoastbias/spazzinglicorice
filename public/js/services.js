@@ -9,7 +9,6 @@ angular.module('services', [])
       data: user
     })
     .then(function (resp) {
-      // console.log('token is ' + resp.data.token);
       console.log('user is logged in');
       // return resp.data.token;
     });
@@ -30,4 +29,33 @@ angular.module('services', [])
     isAuth: isAuth,
     signout: signout
   };
+})
+
+.factory('Boards', function ($http) {
+
+  var getAll = function () {
+    return $http({
+      method: 'GET',
+      url: '/getBoards'
+    })
+    .then(function (resp) {
+      return resp.data;
+    });
+  };
+
+  var getNew = function () {
+    return $http({
+      method: 'GET',
+      url: '/new'
+    })
+    .then(function (resp) {
+      return resp.data;
+    });
+  };
+
+  return {
+    getAll: getAll,
+    getNew: getNew
+  };
+
 });
