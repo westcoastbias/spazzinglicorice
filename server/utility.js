@@ -14,9 +14,7 @@ exports.checkUser = function(req, res, next){
 
 exports.createSession = function(req, res, newUser) {
   return req.session.regenerate(function() {
-      console.log('newUser is ' + newUser);
       req.session.user = newUser;
-      console.log('in utilities, redirecting to boards');
       res.status(301).redirect('/boards');
     });
 };

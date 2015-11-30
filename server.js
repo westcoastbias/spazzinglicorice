@@ -63,18 +63,13 @@ app.post('/signin', function(req, res) {
         password: password,
         boards: []
       });
-      console.log('newUser is ' + newUser);
       newUser.save()
         .then(function(newUser) {
-          console.log('newUser is saved as ' + newUser);
           util.createSession(req, res, newUser);
         });
   //username is in the db, so we check the password and see if we can log the user in      
     } else {
-      console.log('found user');
-      console.log('user is ' + user );
       user.comparePassword(password, function (match) {
-        console.log('match is ' + match);
         if (match) {
           util.createSession(req, res, user);
         } else {
@@ -86,20 +81,15 @@ app.post('/signin', function(req, res) {
 });
 
 app.get('/boards', function(req, res) {
-  console.log('loading boards.html');
-  console.log('session boards ' + JSON.stringify(req.session.user.boards));
   util.checkUser(req, res, function() {
-    console.log('res is ' + JSON.stringify(res.end));
     res.sendFile(__dirname + '/public/boards.html');
   });
 });
 
 //api endpoint hit by boards.html to pull the list of boards for the logged in user
 app.get('/getBoards', function(req, res) {
-  console.log('req.session.user.boards is ' + JSON.stringify(req.session.user.boards));
   User.findOne({email:req.session.user.email})
   .then(function(user) {
-    console.log('user in getBoards is ' + user);
     res.send(user.boards);
   })
 });
@@ -113,12 +103,10 @@ app.get('/new', function(req, res) {
   board.save(function(err, board) {
     if (err) { console.error(err); }
     else {
-      console.log('board saved!');
       if(email) {
         User.findOneAndUpdate({email: email},{$push: {boards: id} },{upsert:true},function(err, user){
           if(err){ console.log(err); }
           else {
-            console.log("Successfully added the board to the user");
             res.send(id);
           }
         });
@@ -137,7 +125,6 @@ app.get('/*', function(req, res) {
   Board.boardModel.findOne({id: id}, function(err, board) {
     // If the board doesn't exist, or the route is invalid,
     // then redirect to the home page.
-    console.log('going to board');
     if (err) {
       res.redirect('/');
     } else {
