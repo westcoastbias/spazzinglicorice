@@ -4,6 +4,7 @@
 var mongoose = require('mongoose');
 
 var dbpath = process.env.MONGOLAB_URI || 'mongodb://127.0.0.1';
+console.log('dbpath is' + dbpath);
 mongoose.connect(dbpath);
 
 var db = mongoose.connection;

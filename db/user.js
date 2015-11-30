@@ -12,11 +12,15 @@ var userSchema = new mongoose.Schema ({
 });
 
 userSchema.pre('save', function ( next ) {
-  this.hashPassword();
-  next();
-});
+  console.log('in the presave hook');
+  this.hashPassword().then(function(){
+    next();
+  });
+}, this);
+
 
 userSchema.methods.hashPassword = function () {
+  console.log('in the hashPassword function');
   var cipher = Promise.promisify(bcrypt.hash);
   return cipher(this.password, null, null).bind(this)
     .then(function(hash) {
@@ -33,4 +37,5 @@ userSchema.methods.comparePassword = function (attemptedPassword, callback) {
 var User = mongoose.model('user', userSchema);
 
 module.exports = User;
+
 

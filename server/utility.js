@@ -6,7 +6,7 @@ var isLoggedIn = function(req) {
 
 exports.checkUser = function(req, res, next){
   if (!isLoggedIn(req)) {
-    res.redirect('/login');
+    res.redirect('/signin');
   } else {
     next();
   }
@@ -15,6 +15,6 @@ exports.checkUser = function(req, res, next){
 exports.createSession = function(req, res, newUser) {
   return req.session.regenerate(function() {
       req.session.user = newUser;
-      res.redirect('/');
+      res.status(301).redirect('/boards');
     });
 };
