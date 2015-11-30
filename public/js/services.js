@@ -32,7 +32,7 @@ angular.module('services', [])
   var getNew = function () {
     return $http({
       method: 'GET',
-      url: '/new'
+      url: '/newFromBoards'
     })
     .then(function (resp) {
       return resp.data;

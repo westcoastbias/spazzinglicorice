@@ -107,6 +107,29 @@ app.get('/new', function(req, res) {
         User.findOneAndUpdate({email: email},{$push: {boards: id} },{upsert:true},function(err, user){
           if(err){ console.log(err); }
           else {
+            res.redirect('/' + id);
+          }
+        });
+      } else {
+        // Redirect to the new board.
+        res.redirect('/' + id);
+      }
+    }
+  });
+});
+
+app.get('/newFromBoards', function(req, res) {
+  // Create a new mongoose board model.
+  var board = new Board.boardModel({strokes: []});
+  var id = board._id.toString();
+  var email = req.session.user.email || null;
+  board.save(function(err, board) {
+    if (err) { console.error(err); }
+    else {
+      if(email) {
+        User.findOneAndUpdate({email: email},{$push: {boards: id} },{upsert:true},function(err, user){
+          if(err){ console.log(err); }
+          else {
             res.send(id);
           }
         });
