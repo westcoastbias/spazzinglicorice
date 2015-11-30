@@ -20,10 +20,21 @@ angular.module('signin', ['services'])
         if ( data.length === 0) {
           $scope.newBoard();
         } else {
-          $scope.data = data;
-          console.log('$scope.data is ' + $scope.data)
+          $scope.data.boards = data;
           $window.location = '/boards';
+          console.log('$scope.data is ' + $scope.data.boards) 
         }
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+  };
+
+  $scope.getBoardsOnce = function () {
+    Boards.getAll()
+      .then(function (data) {
+          $scope.data.boards = data;
+          console.log('$scope.data is ' + $scope.data.boards) 
       })
       .catch(function (error) {
         console.error(error);
@@ -39,5 +50,7 @@ angular.module('signin', ['services'])
        console.error(error);
      });
  }; 
+
+ // $scope.getBoardsOnce();
 
 });

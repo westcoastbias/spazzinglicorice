@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-controller='signinController'>
+<html ng-app='boards'>
   <head>
     <meta charset="UTF-8">
     <title>Colla-board-rate</title>
@@ -12,15 +12,17 @@
       <!-- <source src="assets/dayinthelifeshort-720p.mov" type="video/mp4"> -->
     </video>
       <h3 id="boardsHeader" >Your Boards</h3>
-    <input type='text' ng-model='search' placeholder='filter' />
-    <div class="links">
-      <div class="link"
-          ng-repeat="board in data | filter:search | orderBy:'id'">
+      <form ng-controller="BoardsController" name="NewBoardForm" ng-submit='newBoard()'>
+        <button>Create New Board</button>
+      </form>
+    <!-- <input type='text' ng-model='search' placeholder='filter' /> -->
+    <div ng-controller="BoardsController" class="links">
+      <div class="link" ng-repeat="board in data.boards">
         <div class="info">
-          <div class="visits">
-            <span class="count">{{ board.name }}</span>
-          </div>
-          <a href="http://localhost:8080/{{ board.id }}">{{ board.id }}</a>
+          <!-- <div class="visits"> -->
+            <!-- <span class="count">{{ board.name }}</span> -->
+          <!-- </div> -->
+          <a href="http://localhost:8080/{{ board }}">{{ board }}</a>
         </div>
       </div>
     </div>
@@ -30,7 +32,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.2/angular-route.min.js"></script>
-    <script src='../js/signin.js'></script>
+    <script src='../js/boards.js'></script>
     <script src='../js/services.js'></script>
 
     
