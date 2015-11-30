@@ -99,7 +99,7 @@ app.get('/new', function(req, res) {
   // Create a new mongoose board model.
   var board = new Board.boardModel({strokes: []});
   var id = board._id.toString();
-  var email = req.session.user.email || null;
+  var email = req.session.user ? req.session.user.email : null;
   board.save(function(err, board) {
     if (err) { console.error(err); }
     else {
